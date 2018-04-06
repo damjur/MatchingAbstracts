@@ -196,12 +196,15 @@ def getPropositions(path):
 
 def binarySearch(column):
     n = len(column)
-    i = n / 2
-    d = n / 2
+    i = int(n / 2)
+    d = int(n / 2)
+    #     print(i,d,n)
+    #     print(column[i] == column[i+1])
     while column[i] == column[i + 1]:
         d /= 2
         if d < 1:
             d = 1
+        d = int(d)
         if column[i] != 0:
             i -= d
         else:
@@ -214,8 +217,10 @@ def binarySearch(column):
 
 
 def findEdge(img):
+    edge = []
     img = (img > 150) * 255
-    edge = [binarySearch(x) for x in img.T]
+    for column in img.T:
+        edge.append(binarySearch(column))
     return edge
 
 
@@ -225,7 +230,10 @@ def compareImagesCorr(imgs):
         edges.append([])
         for img in imgSet:
             edges[i].append(findEdge(img))
-    print(len(imgs))
+            # if len(findEdge(img)) < 5:
+            #     print(i)
+        #     print(edges)
+        #     print(len(imgs))
     pearson = np.zeros((len(edges), len(edges)))
     for i in range(len(edges)):
         for edge in edges[i]:
@@ -234,6 +242,8 @@ def compareImagesCorr(imgs):
                 for edge2 in edges[j]:
                     pearson[i][j] = max(pearson[i][j], pearsonr(edge, edge2)[0] ** 2)
                 pearson[j][i] = pearson[i][j]
+    for i in range(len(pearson)):
+        pearson[i][i] = -1
     return pearson
 
 
@@ -253,7 +263,7 @@ def compareImagesDiff(imgs):
 def matrix2result(m):
     result = []
     for row in m:
-        result.append(np.argsort(row))
+        result.append(row.argsort()[::-1])
     return result
 
 
@@ -271,5 +281,6 @@ if __name__ == "__main__":
                     imgs[i].append(prop)
         m = compareImagesCorr(imgs)
         r = matrix2result(m)
+        print(r)
         for line in r:
-            print(' '.join(line))
+            print(' '.join(str(x) for x in line))
