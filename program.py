@@ -281,6 +281,5 @@ if __name__ == "__main__":
                     imgs[i].append(prop)
         m = compareImagesCorr(imgs)
         r = matrix2result(m)
-        print(r)
         for line in r:
             print(' '.join(str(x) for x in line))
